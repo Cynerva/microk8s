@@ -5,31 +5,60 @@ version-script: |
 version: "latest"
 summary: Kubernetes in your box.
 description: Microk8s deploys and configures all kubernetes services in a snap.
-grade: stable
-confinement: classic
+grade: devel
+confinement: strict
 
 apps:
   daemon-etcd:
     command: run-etcd-with-args
     daemon: simple
+    plugs:
+    - network-bind
   daemon-docker:
     command: run-docker-with-args
     daemon: simple
+    plugs:
+    - docker-support
+    - firewall-control
+    - kernel-module-control
+    - network-bind
+    - network-control
   daemon-apiserver:
     command: run-with-config-args kube-apiserver
     daemon: simple
+    plugs:
+    - network-bind
   daemon-controller-manager:
     command: run-with-config-args kube-controller-manager
     daemon: simple
+    plugs:
+    - network-bind
   daemon-scheduler:
     command: run-with-config-args kube-scheduler
     daemon: simple
+    plugs:
+    - network-bind
   daemon-kubelet:
     command: run-with-config-args kubelet
     daemon: simple
+    plugs:
+    - firewall-control
+    - network-bind
+    - k8s-kubelet
+    - kernel-module-observe
+    - hardware-observe
+    - mount-observe
+    - system-observe
   daemon-proxy:
     command: run-with-config-args kube-proxy
     daemon: simple
+    plugs:
+    - network-bind
+    - firewall-control
+    - k8s-kubeproxy
+    - kernel-module-observe
+    - mount-observe
+    - system-observe
   kubectl:
     command: kubectl --kubeconfig=$SNAP/client.config
   docker:
